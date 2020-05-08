@@ -3,6 +3,7 @@ package com.edu.edufirebase;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
+
                             if (task.isSuccessful()) {
                                 // Sing in success, update UI with the singed in user's information
                                 //Log.i("INFO", "createUserWithEmail: success");
@@ -87,6 +89,9 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(MainActivity.this,
                                         "Sing up successfully",
                                         Toast.LENGTH_LONG).show();
+
+                                switchToSocialMediaActivity();
+
                             } else {
                                 Toast.makeText(MainActivity.this,
                                         "Authentication Error",
@@ -106,10 +111,14 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+
                 if (task.isSuccessful()) {
                     Toast.makeText(MainActivity.this,
                             "Sing in successfully",
                             Toast.LENGTH_LONG).show();
+
+                    switchToSocialMediaActivity();
+
                 } else {
                     Toast.makeText(MainActivity.this,
                             "Authentication Error",
@@ -117,5 +126,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void switchToSocialMediaActivity() {
+        Intent intent = new Intent(this, SocialMediaActivity.class);
+        startActivity(intent);
     }
 }
