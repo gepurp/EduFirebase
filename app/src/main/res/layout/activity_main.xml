@@ -44,10 +44,10 @@
             android:text="Sing Up" />
 
         <Button
-            android:id="@+id/btnLogin"
+            android:id="@+id/btnSignIn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Log In" />
+            android:text="Sign In" />
     </LinearLayout>
 </LinearLayout>

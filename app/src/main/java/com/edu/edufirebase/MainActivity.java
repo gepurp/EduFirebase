@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText edtUsername;
     private EditText edtPassword;
     private Button btnSingUp;
-    private Button btnLogin;
+    private Button btnSignIn;
 
     // Firebase Auth declaration
     private FirebaseAuth mAuth;
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         edtUsername = findViewById(R.id.edtUsername);
         edtPassword = findViewById(R.id.edtPassword);
         btnSingUp = findViewById(R.id.btnSingUp);
-        btnLogin = findViewById(R.id.btnLogin);
+        btnSignIn = findViewById(R.id.btnSignIn);
 
         // Firebase Auth initialization
         mAuth = FirebaseAuth.getInstance();
@@ -48,6 +48,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 singUp();
+            }
+        });
+
+        // Call sign in method after clicking the sign in button
+        btnSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn();
             }
         });
     }
@@ -91,5 +99,23 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "All fields must be filled", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    private void signIn() {
+        mAuth.signInWithEmailAndPassword(edtEmail.getText().toString(), edtPassword.getText().toString())
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(MainActivity.this,
+                            "Sing in successfully",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(MainActivity.this,
+                            "Authentication Error",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 }
