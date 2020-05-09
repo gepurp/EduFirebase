@@ -34,11 +34,8 @@ public class SocialMediaActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-
-            case R.id.logoutItem:
-
+            case R.id.signOutItem:
                 signOut();
-
                 break;
         }
         return super.onOptionsItemSelected(item);
