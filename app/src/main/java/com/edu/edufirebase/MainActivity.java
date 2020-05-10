@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -116,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this,
                             "Sing in successfully",
                             Toast.LENGTH_LONG).show();
+
+                    //FirebaseDatabase.getInstance().getReference().child("users").child();
 
                     switchToSocialMediaActivity();
 
