@@ -18,6 +18,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.security.spec.ECField;
+
 public class MainActivity extends AppCompatActivity {
 
     // UI Components declaration
@@ -73,10 +75,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void singUp() {
-
-        // Check the empty fields for user's info
-        if ((edtEmail.getText() != null) || (edtPassword.getText() != null)) {
-
+        try {
             // Sing Up new users
             mAuth.createUserWithEmailAndPassword(edtEmail.getText().toString(), edtPassword.getText().toString())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -100,35 +99,39 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     });
-        } else {
-            // Show message if some filed is empty
-            Toast.makeText(MainActivity.this, "All fields must be filled", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Error: " + e, Toast.LENGTH_LONG).show();
         }
-
     }
 
     private void signIn() {
-        mAuth.signInWithEmailAndPassword(edtEmail.getText().toString(), edtPassword.getText().toString())
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
+        try {
+            mAuth.signInWithEmailAndPassword(edtEmail.getText().toString(), edtPassword.getText().toString())
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
 
-                if (task.isSuccessful()) {
-                    Toast.makeText(MainActivity.this,
-                            "Sing in successfully",
-                            Toast.LENGTH_LONG).show();
+                            if (task.isSuccessful()) {
+                                Toast.makeText(MainActivity.this,
+                                        "Sing in successfully",
+                                        Toast.LENGTH_LONG).show();
 
-                    //FirebaseDatabase.getInstance().getReference().child("users").child();
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child("users").child(task.getResult().getUser().getUid())
+                                        .child("username").setValue(edtUsername.getText().toString());
 
-                    switchToSocialMediaActivity();
+                                switchToSocialMediaActivity();
 
-                } else {
-                    Toast.makeText(MainActivity.this,
-                            "Authentication Error",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+                            } else {
+                                Toast.makeText(MainActivity.this,
+                                        "Authentication Error",
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+        } catch (Exception e) {
+            Toast.makeText(this, "Error: " + e, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void switchToSocialMediaActivity() {
