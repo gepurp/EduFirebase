@@ -25,7 +25,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+import java.util.UUID;
 
 public class SocialMediaActivity extends AppCompatActivity {
 
@@ -40,6 +48,9 @@ public class SocialMediaActivity extends AppCompatActivity {
 
     // Bitmap declaration
     private Bitmap bitmap;
+
+    // Unique id for each image
+    private String imageIdentifier;
 
 
     @Override
@@ -69,6 +80,8 @@ public class SocialMediaActivity extends AppCompatActivity {
         btnPostImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                uploadImgToServer();
 
             }
         });
@@ -163,6 +176,39 @@ public class SocialMediaActivity extends AppCompatActivity {
 
             }
         }
+    }
+
+    private void uploadImgToServer() {
+
+        // Get the data from an imgViewPost as bytes
+        imgViewPost.setDrawingCacheEnabled(true);
+        imgViewPost.buildDrawingCache();
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] data = byteArrayOutputStream.toByteArray();
+
+        // Initializing unique id for each image
+        imageIdentifier = UUID.randomUUID() + ".jpeg";
+
+        UploadTask uploadTask = FirebaseStorage.getInstance().
+                getReference().child("images").child(imageIdentifier).putBytes(data);
+
+        // Set failure listener in case of unsuccessful uploads
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(SocialMediaActivity.this, "Error: " + e, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Set success listener for doing something in case of success
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(SocialMediaActivity.this, "Success", Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
 }
