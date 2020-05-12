@@ -1,13 +1,29 @@
 package com.edu.edufirebase;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -16,6 +32,16 @@ public class SocialMediaActivity extends AppCompatActivity {
     // Firebase Auth declaration
     private FirebaseAuth mAuth;
 
+    // UI Components declaration
+    private ImageView imgViewPost;
+    private Button btnPostImg;
+    private EditText edtImgDescription;
+    private ListView listViewUsers;
+
+    // Bitmap declaration
+    private Bitmap bitmap;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +49,29 @@ public class SocialMediaActivity extends AppCompatActivity {
 
         // Firebase Auth initialization
         mAuth = FirebaseAuth.getInstance();
+
+        // UI components initialization
+        imgViewPost = findViewById(R.id.imgViewPost);
+        btnPostImg = findViewById(R.id.btnPostImg);
+        edtImgDescription = findViewById(R.id.edtImgDescription);
+        listViewUsers = findViewById(R.id.listViewUsers);
+
+        // Set click listener to the components
+        imgViewPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                selectImage();
+
+            }
+        });
+
+        btnPostImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
     @Override
@@ -50,5 +99,70 @@ public class SocialMediaActivity extends AppCompatActivity {
     private void signOut() {
         mAuth.signOut();
         finish();
+    }
+
+    // Select image from gallery
+    private void selectImage() {
+
+        // Check the SDK version
+        if (Build.VERSION.SDK_INT < 23) {
+
+            // Access to the external storage
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(intent, 1000);
+
+        } else if (Build.VERSION.SDK_INT >= 23) {
+
+            // Check the permission was granted or not
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Ask permission
+                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 1000);
+
+            } else {
+
+                // Access to the external storage
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, 1000);
+
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1000
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            selectImage();
+
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1000
+                && resultCode == RESULT_OK
+                && data != null) {
+
+            Uri chosenImage = data.getData();
+
+            try {
+
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), chosenImage);
+                imgViewPost.setImageBitmap(bitmap);
+
+            } catch (Exception e) {
+
+                Toast.makeText(this, "Error: " + e, Toast.LENGTH_LONG).show();
+
+            }
+        }
+
     }
 }
