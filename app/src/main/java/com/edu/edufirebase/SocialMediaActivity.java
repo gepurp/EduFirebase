@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,6 +34,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class SocialMediaActivity extends AppCompatActivity {
@@ -45,6 +47,8 @@ public class SocialMediaActivity extends AppCompatActivity {
     private Button btnPostImg;
     private EditText edtImgDescription;
     private ListView listViewUsers;
+    private ArrayList<String> userNames;
+    private ArrayAdapter arrayAdapter;
 
     // Bitmap declaration
     private Bitmap bitmap;
@@ -66,6 +70,10 @@ public class SocialMediaActivity extends AppCompatActivity {
         btnPostImg = findViewById(R.id.btnPostImg);
         edtImgDescription = findViewById(R.id.edtImgDescription);
         listViewUsers = findViewById(R.id.listViewUsers);
+
+        // Initialize array list and array adapter for getting the list of users
+        userNames = new ArrayList<>();
+        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, userNames);
 
         // Set click listener to the components
         imgViewPost.setOnClickListener(new View.OnClickListener() {
@@ -180,35 +188,42 @@ public class SocialMediaActivity extends AppCompatActivity {
 
     private void uploadImgToServer() {
 
-        // Get the data from an imgViewPost as bytes
-        imgViewPost.setDrawingCacheEnabled(true);
-        imgViewPost.buildDrawingCache();
+        if (bitmap != null) {
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        byte[] data = byteArrayOutputStream.toByteArray();
+            // Get the data from an imgViewPost as bytes
+            imgViewPost.setDrawingCacheEnabled(true);
+            imgViewPost.buildDrawingCache();
 
-        // Initializing unique id for each image
-        imageIdentifier = UUID.randomUUID() + ".jpeg";
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            byte[] data = byteArrayOutputStream.toByteArray();
 
-        UploadTask uploadTask = FirebaseStorage.getInstance().
-                getReference().child("images").child(imageIdentifier).putBytes(data);
+            // Initializing unique id for each image
+            imageIdentifier = UUID.randomUUID() + ".jpeg";
 
-        // Set failure listener in case of unsuccessful uploads
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(SocialMediaActivity.this, "Error: " + e, Toast.LENGTH_LONG).show();
-            }
-        });
+            UploadTask uploadTask = FirebaseStorage.getInstance().
+                    getReference().child("images").child(imageIdentifier).putBytes(data);
 
-        // Set success listener for doing something in case of success
-        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(SocialMediaActivity.this, "Success", Toast.LENGTH_LONG).show();
-            }
-        });
+            // Set failure listener in case of unsuccessful uploads
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(SocialMediaActivity.this, "Error: " + e, Toast.LENGTH_LONG).show();
+                }
+            });
 
+            // Set success listener for doing something in case of success
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Toast.makeText(SocialMediaActivity.this, "Success", Toast.LENGTH_LONG).show();
+
+                    // Show the edit text after successfully uploading
+                    edtImgDescription.setVisibility(View.VISIBLE);
+                }
+            });
+        } else {
+            Toast.makeText(SocialMediaActivity.this, "You need to pick the image", Toast.LENGTH_LONG).show();
+        }
     }
 }

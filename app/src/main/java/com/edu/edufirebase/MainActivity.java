@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
 
                             if (task.isSuccessful()) {
+
                                 // Sing in success, update UI with the singed in user's information
                                 //Log.i("INFO", "createUserWithEmail: success");
                                 //FirebaseUser user = mAuth.getCurrentUser();
@@ -90,9 +91,14 @@ public class MainActivity extends AppCompatActivity {
                                         "Sing up successfully",
                                         Toast.LENGTH_LONG).show();
 
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child("users").child(task.getResult().getUser().getUid())
+                                        .child("username").setValue(edtUsername.getText().toString());
+
                                 switchToSocialMediaActivity();
 
                             } else {
+
                                 Toast.makeText(MainActivity.this,
                                         "Authentication Error",
                                         Toast.LENGTH_LONG).show();
@@ -112,17 +118,15 @@ public class MainActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
 
                             if (task.isSuccessful()) {
+
                                 Toast.makeText(MainActivity.this,
                                         "Sing in successfully",
                                         Toast.LENGTH_LONG).show();
 
-                                FirebaseDatabase.getInstance().getReference()
-                                        .child("users").child(task.getResult().getUser().getUid())
-                                        .child("username").setValue(edtUsername.getText().toString());
-
                                 switchToSocialMediaActivity();
 
                             } else {
+
                                 Toast.makeText(MainActivity.this,
                                         "Authentication Error",
                                         Toast.LENGTH_LONG).show();
