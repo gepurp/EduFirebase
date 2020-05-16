@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.security.spec.ECField;
@@ -93,7 +94,22 @@ public class MainActivity extends AppCompatActivity {
                                         .child("users").child(task.getResult().getUser().getUid())
                                         .child("username").setValue(edtUsername.getText().toString());
 
-                                
+                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(edtUsername.getText().toString())
+                                        .build();
+
+                                FirebaseAuth.getInstance().getCurrentUser().updateProfile(profileUpdates)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(MainActivity.this,
+                                                    "Profile Updated",
+                                                    Toast.LENGTH_LONG)
+                                                    .show();
+                                        }
+                                    }
+                                });
 
                                 switchToSocialMediaActivity();
 
