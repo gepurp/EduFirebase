@@ -84,9 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
                             if (task.isSuccessful()) {
 
-                                // Sing in success, update UI with the singed in user's information
-                                //Log.i("INFO", "createUserWithEmail: success");
-                                //FirebaseUser user = mAuth.getCurrentUser();
+                                // Sing up success, update UI with the singed up user's information
                                 Toast.makeText(MainActivity.this,
                                         "Sing up successfully",
                                         Toast.LENGTH_LONG).show();
@@ -94,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
                                 FirebaseDatabase.getInstance().getReference()
                                         .child("users").child(task.getResult().getUser().getUid())
                                         .child("username").setValue(edtUsername.getText().toString());
+
+                                
 
                                 switchToSocialMediaActivity();
 

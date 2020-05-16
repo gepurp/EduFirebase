@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -14,16 +13,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -40,7 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class SocialMediaActivity extends AppCompatActivity {
+public class SocialMediaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     // Firebase Auth declaration
     private FirebaseAuth mAuth;
@@ -50,7 +48,8 @@ public class SocialMediaActivity extends AppCompatActivity {
     private Button btnPostImg;
     private EditText edtImgDescription;
     private ListView listViewUsers;
-    private ArrayList<String> userNames;
+    private ArrayList<String> userNamesArrayList;
+    private ArrayList<String> usersUIDArrayList;
     private ArrayAdapter arrayAdapter;
 
     // Bitmap declaration
@@ -74,11 +73,18 @@ public class SocialMediaActivity extends AppCompatActivity {
         edtImgDescription = findViewById(R.id.edtImgDescription);
         listViewUsers = findViewById(R.id.listViewUsers);
 
-        // Initialize array list and array adapter for getting the list of users
-        userNames = new ArrayList<>();
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, userNames);
+        // Initialize array list and array adapter for getting the information about users
+        userNamesArrayList = new ArrayList<>();
+        usersUIDArrayList = new ArrayList<>();
+        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, userNamesArrayList);
 
-        // Set click listener to the components
+        // Set adapter on the list view
+        listViewUsers.setAdapter(arrayAdapter);
+
+        // Set click listener on tne list view with users
+        listViewUsers.setOnItemClickListener(this);
+
+        // Set click listener on the components
         imgViewPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -228,6 +234,17 @@ public class SocialMediaActivity extends AppCompatActivity {
                         @Override
                         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
+                            // Add UIDs to array list
+                            usersUIDArrayList.add(dataSnapshot.getKey());
+
+                            // Get users from database
+                            String userName = (String) dataSnapshot.child("username").getValue();
+
+                            // Add users to array list
+                            userNamesArrayList.add(userName);
+
+                            // Update information in the list view with users data
+                            arrayAdapter.notifyDataSetChanged();
                         }
 
                         @Override
@@ -255,5 +272,10 @@ public class SocialMediaActivity extends AppCompatActivity {
         } else {
             Toast.makeText(SocialMediaActivity.this, "You need to pick the image", Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
     }
 }
