@@ -24,8 +24,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -36,6 +38,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class SocialMediaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
@@ -48,15 +51,24 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
     private Button btnPostImg;
     private EditText edtImgDescription;
     private ListView listViewUsers;
-    private ArrayList<String> userNamesArrayList;
-    private ArrayList<String> usersUIDArrayList;
+
+    // Adapter for list view with users
     private ArrayAdapter arrayAdapter;
 
-    // Bitmap declaration
+    // List of user names
+    private ArrayList<String> userNamesArrayList;
+
+    // List of user UIDs
+    private ArrayList<String> usersUIDArrayList;
+
+    // Bitmap
     private Bitmap bitmap;
 
     // Unique id for each image
     private String imageIdentifier;
+
+    // Image download link
+    private String imageDownloadLink;
 
 
     @Override
@@ -267,6 +279,17 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
 
                         }
                     });
+
+                    taskSnapshot.getMetadata().getReference().getDownloadUrl()
+                            .addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+
+                            if (task.isSuccessful()) {
+                                imageDownloadLink = task.getResult().toString();
+                            }
+                        }
+                    });
                 }
             });
         } else {
@@ -277,5 +300,16 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+        HashMap<String, String> dataMap = new HashMap<>();
+        dataMap.put("from_whom", FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        dataMap.put("image_id", imageIdentifier);
+        dataMap.put("image_link", imageDownloadLink);
+        dataMap.put("image_des", edtImgDescription.getText().toString());
+
+        FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .child(usersUIDArrayList.get(position))
+                .child("received_posts")
+                .push().setValue(dataMap);
     }
 }
