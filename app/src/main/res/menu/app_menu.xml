@@ -2,11 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/signOutItem"
-        android:title="Sign out"/>
-        <!--app:showAsAction="always"-->
+    <item android:id="@+id/signUpItem"
+        android:title="Sign Up" />
+
+    <item android:id="@+id/signInItem"
+        android:title="Sign In"/>
 
     <item android:id="@+id/postsItem"
         android:title="Posts" />
+
+    <item android:id="@+id/signOutItem"
+        android:title="Sign Out" />
+        <!--app:showAsAction="always"-->
 
 </menu>

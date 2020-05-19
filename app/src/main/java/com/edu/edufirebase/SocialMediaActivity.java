@@ -119,6 +119,8 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.app_menu, menu);
+        menu.findItem(R.id.signUpItem).setVisible(false);
+        menu.findItem(R.id.signInItem).setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 

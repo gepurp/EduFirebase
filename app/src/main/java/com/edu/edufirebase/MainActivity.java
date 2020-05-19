@@ -5,7 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,10 +17,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.security.spec.ECField;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
     private EditText edtEmail;
     private EditText edtUsername;
     private EditText edtPassword;
-    private Button btnSingUp;
     private Button btnSignIn;
 
     // Firebase Auth declaration
@@ -40,21 +36,11 @@ public class MainActivity extends AppCompatActivity {
 
         // UI Components initialization
         edtEmail = findViewById(R.id.edtEmail);
-        edtUsername = findViewById(R.id.edtUsername);
         edtPassword = findViewById(R.id.edtPassword);
-        btnSingUp = findViewById(R.id.btnSingUp);
         btnSignIn = findViewById(R.id.btnSignIn);
 
         // Firebase Auth initialization
         mAuth = FirebaseAuth.getInstance();
-
-        // Call sing up method after clicking the sing up button
-        btnSingUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                singUp();
-            }
-        });
 
         // Call sign in method after clicking the sign in button
         btnSignIn.setOnClickListener(new View.OnClickListener() {
@@ -75,55 +61,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void singUp() {
-        try {
-            // Sing Up new users
-            mAuth.createUserWithEmailAndPassword(edtEmail.getText().toString(), edtPassword.getText().toString())
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-
-                            if (task.isSuccessful()) {
-
-                                // Sing up success, update UI with the singed up user's information
-                                Toast.makeText(MainActivity.this,
-                                        "Sing up successfully",
-                                        Toast.LENGTH_LONG).show();
-
-                                FirebaseDatabase.getInstance().getReference()
-                                        .child("users").child(task.getResult().getUser().getUid())
-                                        .child("username").setValue(edtUsername.getText().toString());
-
-                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                        .setDisplayName(edtUsername.getText().toString())
-                                        .build();
-
-                                FirebaseAuth.getInstance().getCurrentUser().updateProfile(profileUpdates)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Toast.makeText(MainActivity.this,
-                                                    "Profile Updated",
-                                                    Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
-
-                                switchToSocialMediaActivity();
-
-                            } else {
-
-                                Toast.makeText(MainActivity.this,
-                                        "Authentication Error",
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-        } catch (Exception e) {
-            Toast.makeText(this, "Error: " + e, Toast.LENGTH_LONG).show();
-        }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.app_menu, menu);
+        menu.findItem(R.id.signOutItem).setVisible(false);
+        menu.findItem(R.id.postsItem).setVisible(false);
+        menu.findItem(R.id.signInItem).setVisible(false);
+        return super.onCreateOptionsMenu(menu);
     }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.signUpItem) {
+            Intent intent = new Intent(this, SignUp.class);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
     private void signIn() {
         try {
