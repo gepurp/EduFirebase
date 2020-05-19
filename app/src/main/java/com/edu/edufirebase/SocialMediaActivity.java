@@ -125,8 +125,14 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+
             case R.id.signOutItem:
                 signOut();
+                break;
+
+            case R.id.postsItem:
+                Intent intent = new Intent(this, ViewPostsActivity.class);
+                startActivity(intent);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -310,6 +316,14 @@ public class SocialMediaActivity extends AppCompatActivity implements AdapterVie
                 .child("users")
                 .child(usersUIDArrayList.get(position))
                 .child("received_posts")
-                .push().setValue(dataMap);
+                .push().setValue(dataMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(SocialMediaActivity.this, "Data was successfully sent", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 }
