@@ -21,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUp extends AppCompatActivity {
 
+    // UI Components declaration
     private EditText edtEmailSignUp;
     private EditText edtUserNameSignUp;
     private EditText edtPasswordSignUp;
