@@ -55,6 +55,8 @@ public class SignUp extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.app_menu, menu);
+
+        // Hide another items in menu
         menu.findItem(R.id.signOutItem).setVisible(false);
         menu.findItem(R.id.signUpItem).setVisible(false);
         menu.findItem(R.id.postsItem).setVisible(false);
